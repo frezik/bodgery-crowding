@@ -9,7 +9,7 @@
     "prepack": "rm -rf dist && tsc --outDir dist/ index.ts && npx typedoc --out dist/doc src"
   },
   "author": "Timm Murray <tmurray@wumpus-cave.net>",
-  "license": "Proprietary",
+  "license": "BSD-2-Clause",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "express": "^4.17.1"
