@@ -1,0 +1,22 @@
+{
+  "name": "@bodgery/crowding",
+  "version": "0.1.0",
+  "description": "Estimate entries/exits to a building",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "ts-node scripts/run.ts",
+    "test": "rm -rf dist && tsc --outDir dist/ test/*.ts && tap dist/test/**/*.js",
+    "prepack": "rm -rf dist && tsc --outDir dist/ index.ts && npx typedoc --out dist/doc src"
+  },
+  "author": "Timm Murray <tmurray@wumpus-cave.net>",
+  "license": "Proprietary",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.5.0",
+    "supertest": "^4.0.2",
+    "tap": "^14.10.7"
+  }
+}
