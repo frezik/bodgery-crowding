@@ -79,7 +79,7 @@ async function handleSetEntry( req, res ): Promise<void>
             (req.params[ 'direction' ] == "out") ? DB.Direction.OUT :
             DB.Direction.OUT;
         // TODO set location
-        await DB.addEntry( dir );
+        await DB.addEntry( dir, req.params[ 'location' ] );
         res.sendStatus( 201 );
     }
 

@@ -63,6 +63,7 @@ export async function createDB( args: {
 
 export async function addEntry(
     dir: Direction
+    ,location: string
 ): Promise<void>
 {
     const db = await connect();
@@ -72,6 +73,7 @@ export async function addEntry(
             measurement: 'entries'
             ,tags: {
                 direction: dir
+                ,location: location
             }
             ,fields: {
                 dummy: 1
@@ -82,6 +84,7 @@ export async function addEntry(
 
 export async function entries(
     dir: Direction
+    ,location: string
     ,time_sec: number
 ): Promise<number>
 {
@@ -91,8 +94,9 @@ export async function entries(
         "SELECT COUNT(dummy) as row_count"
         ," FROM entries"
         ," WHERE"
-            ," direction = '", dir, "'" 
-            ,' AND time > now() - ', time_sec, 's'
+            ,` direction = '${dir}'` 
+            ,` AND location = '${location}'`
+            ,` AND time > now() - ${time_sec}s`
     ].join( "" );
 
     return new Promise( (resolve, reject) => {
