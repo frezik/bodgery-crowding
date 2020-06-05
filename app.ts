@@ -46,6 +46,8 @@ async function initRoutes(
 ): Promise<void>
 {
     app.post( '/v1/event/entry/:location/:direction', handleSetEntry );
+    app.get( '/v1/event/entry/:location/:direction/:time', handleFetchEntry );
+
     return new Promise( (resolve, reject) => {
         resolve();
     });
@@ -78,9 +80,57 @@ async function handleSetEntry( req, res ): Promise<void>
             (req.params[ 'direction' ] == "in") ? DB.Direction.IN :
             (req.params[ 'direction' ] == "out") ? DB.Direction.OUT :
             DB.Direction.OUT;
-        // TODO set location
         await DB.addEntry( dir, req.params[ 'location' ] );
         res.sendStatus( 201 );
+    }
+
+    return new Promise( (resolve, reject) => {
+        resolve();
+    });
+}
+
+async function handleFetchEntry( req, res ): Promise<void>
+{
+    const schema = Joi.object({
+        location: Joi.string().alphanum()
+        ,direction: Joi.any().allow(
+            DB.Direction.IN
+            ,DB.Direction.OUT
+        )
+        ,time: Joi.number().positive().integer()
+    });
+
+    const { error, params } = await schema.validate({
+        location: req.params[ 'location' ]
+        ,direction: req.params[ 'direction' ]
+        ,time: req.params[ 'time' ]
+    });
+
+    if( error ) {
+        res
+            .status( 400 )
+            .send( error.details.map( (_) => {
+                return `Key ${_.context.key} is not valid`
+            } ) );
+    }
+    else {
+        const dir: DB.Direction = 
+            (req.params[ 'direction' ] == "in") ? DB.Direction.IN :
+            (req.params[ 'direction' ] == "out") ? DB.Direction.OUT :
+            DB.Direction.OUT;
+        const count = await DB.entries(
+            dir
+            ,req.params[ 'location' ]
+            ,req.params[ 'time' ]
+        );
+
+        res
+            .status( 200 )
+            // Want to send this as a bare number, but Express thinks you're 
+            // trying to send an HTTP status code. Which makes it throw a 
+            // deprecation warning. Appease the god of JSON by wrapping it in 
+            // an array.
+            .send([ count ]);
     }
 
     return new Promise( (resolve, reject) => {
