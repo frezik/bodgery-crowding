@@ -13,6 +13,7 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "express": "^4.17.1",
+    "express-handlebars": "^4.0.4",
     "influx": "^5.5.1"
   },
   "devDependencies": {

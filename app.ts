@@ -1,5 +1,6 @@
 import * as DB from './src/db';
 import * as Express from 'express';
+import * as Handlebars from 'express-handlebars';
 import * as Joi from '@hapi/joi';
 
 const PORT = 3000;
@@ -33,6 +34,11 @@ export async function makeApp( args?: {
     if(! args.port ) args.port = PORT;
 
     const app = Express();
+    app.engine( '.hbs', Handlebars({
+        extname: '.hbs'
+    }) );
+    app.set( 'view engine', '.hbs' );
+    app.use( Express.static( 'static' ) );
     await initRoutes( app );
 
     return new Promise( (resolve, reject) => {
@@ -45,6 +51,7 @@ async function initRoutes(
     app
 ): Promise<void>
 {
+    app.get( '/', view( 'home' ) );
     app.post( '/v1/event/entry/:location/:direction', handleSetEntry );
     app.get( '/v1/event/entry/:location/:direction/:time', handleFetchEntry );
 
@@ -53,6 +60,18 @@ async function initRoutes(
     });
 }
 
+
+export function view(
+    name: string
+    ,params?: object
+): (req, res) => void
+{
+    if(! params) params = {};
+
+    return async (req, res) => {
+        res.render( name, params );
+    };
+}
 
 async function handleSetEntry( req, res ): Promise<void>
 {
