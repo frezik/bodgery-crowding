@@ -1,0 +1,85 @@
+openapi: 3.0.0
+info:
+    title: Bodgery Event API
+    description: Update and show activity around doors
+    version: 0.0.1
+
+paths:
+    /v1/event/entry/{location}/{direction}:
+        post:
+            summary: Notification of something going through a location in a certain direction
+            parameters:
+                - in: path
+                  name: location
+                  schema:
+                      $ref: '#/components/schemas/Location'
+                  required: true
+                  description: Location the event happened
+                - in: path
+                  name: direction
+                  schema:
+                      $ref: '#/components/schemas/Direction'
+                  required: true
+                  description: Direction of the movement
+            responses:
+                '201':
+                    description: Accepted event
+                '400':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Errors'
+    /v1/event/entry/{location}/{direction}/{time}:
+        get:
+            summary: Get the number of events for the given location and direction over the time period
+            parameters:
+                - in: path
+                  name: location
+                  schema:
+                      $ref: '#/components/schemas/Location'
+                  required: true
+                  description: Location the event happened
+                - in: path
+                  name: direction
+                  schema:
+                      $ref: '#/components/schemas/Direction'
+                  required: true
+                  description: Direction of the movement
+                - in: path
+                  name: time
+                  schema:
+                      $ref: '#/components/schemas/Time'
+                  required: true
+                  description: Number of seconds to look back
+            responses:
+                '200':
+                    description: Number of events
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NumEvents'
+                '400':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Errors'
+
+components:
+    schemas:
+        Location:
+            type: string
+        Direction:
+            type: string
+            enum: [ in, out ]
+        Time:
+            type: integer
+        NumEvents:
+            type: array
+            items:
+                type: integer
+        Errors:
+            type: array
+            items:
+                type: string
