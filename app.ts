@@ -1,38 +1,79 @@
 import * as DB from './src/db';
 import * as Express from 'express';
+import * as Fs from 'fs';
 import * as Handlebars from 'express-handlebars';
 import * as Joi from '@hapi/joi';
+import * as YAML from 'js-yaml';
 
-const PORT = 3000;
+const CONF_FILE = "config.yaml";
 
 
-export async function run( args?: {
-    port?: number
-}): Promise<void>
+export type influxDBArgs = {
+    name: string;
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+}
+
+export type confArgs = {
+    port: number;
+    influx: influxDBArgs;
+}
+
+let conf: confArgs;
+
+
+export function setConf( newConf: confArgs ): void
 {
-    if(! args ) args = {
-        port: PORT
-    };
-    if(! args.port ) args.port = PORT;
-    const app = await makeApp( args );
+    conf = newConf;
+}
 
-    console.log( "Listening on port " + args.port );
-    app.listen( args.port );
+export async function getConf(): Promise<confArgs>
+{
+    if( null == conf ) {
+        await initConf();
+    }
+    return conf;
+}
+
+export function initConf(): Promise<void>
+{
+    return new Promise( (resolve, reject) => {
+        Fs.readFile( CONF_FILE, (err, data) => {
+            if( err ) {
+                reject( "Error reading conf file: " + err );
+            }
+            else {
+                try {
+                    const newConf = YAML.safeLoad( data );
+                    conf = newConf;
+                    resolve();
+                }
+                catch( e ) {
+                    reject( "Error parsing conf YAML: " + e );
+                }
+            }
+        });
+    });
+}
+
+export async function run(): Promise<void>
+{
+    const conf = await getConf();
+    const app = await makeApp();
+
+    console.log( "Listening on port " + conf.port );
+    app.listen( conf.port );
 
     return new Promise( (resolve, reject) => {
         resolve();
     });
 }
 
-export async function makeApp( args?: {
-    port?: number
-}): Promise<any> // Express doesn't have typescript mapping
+export async function makeApp(
+): Promise<any> // Express doesn't have typescript mapping
 {
-    if(! args ) args = {
-        port: PORT
-    };
-    if(! args.port ) args.port = PORT;
-
     const app = Express();
     app.engine( '.hbs', Handlebars({
         extname: '.hbs'

@@ -1,3 +1,4 @@
+import * as App from '../app';
 import * as DB from '../src/db';
 import * as Tap from 'tap';
 import { v4 as UUID } from 'uuid';
@@ -9,9 +10,11 @@ const db_name = "bodgery_entries_" + UUID();
 Tap.comment( "DB name: " + db_name );
 
 
-DB.createDB({
-    database: db_name
-}).then( async () => {
+async function run(): Promise<void>
+{
+    const conf = await App.getConf();
+    conf.influx.name = db_name;
+    await DB.createDB();
     await DB.addEntry( DB.Direction.IN, "front" );
     await DB.addEntry( DB.Direction.IN, "back" );
     await DB.addEntry( DB.Direction.OUT, "back" );
@@ -39,4 +42,8 @@ DB.createDB({
         ,1
     );
     Tap.equals( out_front_count, 1, "One entries out front" );
-});
+
+    return new Promise( (resolve) => resolve() );
+}
+
+run();

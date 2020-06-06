@@ -1,0 +1,7 @@
+port: 3000
+influx:
+    name: bodgery_events
+    host: localhost
+    port: 8086
+    username:
+    password:

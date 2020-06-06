@@ -11,9 +11,12 @@ const db_name = "bodgery_entries_" + UUID();
 Tap.comment( "DB name: " + db_name );
 
 
-DB.createDB({
-    database: db_name
-}).then( async () => {
+async function run(): Promise<void>
+{
+    const conf = await App.getConf();
+    conf.influx.name = db_name;
+    await DB.createDB();
+
     const app = await App.makeApp();
     const agent = Supertest.agent( app );
 
@@ -21,4 +24,8 @@ DB.createDB({
         .post( `/v1/event/entry/front/in` );
     Tap.ok( 201 == response.statusCode,
         "Added entry" );
-});
+
+    return new Promise( (resolve) => resolve() );
+}
+
+run();

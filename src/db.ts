@@ -1,3 +1,4 @@
+import * as Events from '../app';
 import * as Influx from 'influx';
 
 const DEFAULT_HOST = 'localhost';
@@ -24,19 +25,17 @@ export enum Direction {
 
 
 let DB;
-export async function connect( args?: {
-    host?: string
-    ,database?: string
-}): Promise<any> // Influx lib does not have a typescript mapping yet
+export async function connect(
+    args?: Events.influxDBArgs
+): Promise<any> // Influx lib does not have a typescript mapping yet
 {
     if( DB ) return DB;
-    if(! args ) args = {};
-    if(! args.host ) args.host = DEFAULT_HOST;
-    if(! args.database ) args.database = DEFAULT_DATABASE;
+    if(! args ) args = ( await Events.getConf() ).influx;
 
     DB = new Influx.InfluxDB({
+        // TODO port, username, password
         host: args.host
-        ,database: args.database
+        ,database: args.name
         ,schema: INFLUX_SCHEMA
     });
 
@@ -45,18 +44,17 @@ export async function connect( args?: {
     });
 }
 
-export async function createDB( args: {
-    host?: string
-    ,database: string
-}): Promise<any>
+export async function createDB(
+    args?: Events.influxDBArgs
+): Promise<any>
 {
-    if(! args.host ) args.host = DEFAULT_HOST;
+    if(! args ) args = ( await Events.getConf() ).influx;
 
     const db = new Influx.InfluxDB({
         host: args.host
         ,database: "_internal"
     });
-    await db.createDatabase( args.database );
+    await db.createDatabase( args.name );
 
     return await connect( args );
 }
