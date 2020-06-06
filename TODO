@@ -1,4 +1,2 @@
-* InfluxDB DB port and username/password taken from conf
-* Dockerize
 * TS docs
 * Logging

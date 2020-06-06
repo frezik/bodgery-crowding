@@ -33,8 +33,10 @@ export async function connect(
     if(! args ) args = ( await Events.getConf() ).influx;
 
     DB = new Influx.InfluxDB({
-        // TODO port, username, password
         host: args.host
+        ,port: args.port
+        ,username: args.username
+        ,password: args.password
         ,database: args.name
         ,schema: INFLUX_SCHEMA
     });
@@ -52,6 +54,9 @@ export async function createDB(
 
     const db = new Influx.InfluxDB({
         host: args.host
+        ,port: args.port
+        ,username: args.username
+        ,password: args.password
         ,database: "_internal"
     });
     await db.createDatabase( args.name );
