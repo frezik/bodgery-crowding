@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+    web:
+        build: .
+        ports:
+            - "3000:3000"
+        depends_on:
+            - influx
+    influx:
+        image: influxdb:1.8
+        ports:
+            - "8086:8086"
+        volumes:
+            - "/var/lib/influxdb"
+        command: '-config /etc/influxdb/influxdb.conf'

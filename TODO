@@ -1,2 +1,6 @@
+* Docker
+** Compose for influxdb points to existing volume
+** Script to wait for influx to become available (https://docs.docker.com/compose/startup-order/)
+** DB creation script checks if DB exists first
 * TS docs
 * Logging

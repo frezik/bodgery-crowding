@@ -63,8 +63,13 @@ export async function run(): Promise<void>
     const conf = await getConf();
     const app = await makeApp();
 
+    // Preconnect to database, rather than it happening the first time 
+    // we do something with the database. This helps catch errors early.
+    await DB.connect();
+
     console.log( "Listening on port " + conf.port );
     app.listen( conf.port );
+
 
     return new Promise( (resolve, reject) => {
         resolve();

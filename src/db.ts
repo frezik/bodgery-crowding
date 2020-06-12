@@ -32,6 +32,7 @@ export async function connect(
     if( DB ) return DB;
     if(! args ) args = ( await Events.getConf() ).influx;
 
+console.log( `Connecting to host: ${args.host}:${args.port}` );
     DB = new Influx.InfluxDB({
         host: args.host
         ,port: args.port
